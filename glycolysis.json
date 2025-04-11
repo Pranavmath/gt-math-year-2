@@ -1,0 +1,380 @@
+[
+    {
+        "enzyme": "Hexokinase",
+        "substrate": "D-Glucose",
+        "product": "D-Gluctose 6-phosphate",
+        "equation": "(reIV/100)*E*A*B/(Kia*Kb+Ka*B+Kb*A+A*B)",
+        "parameters": {
+            "M": {
+                "type": "concentration",
+                "species": "Mg2+",
+                "start_val": "NULL"
+            },
+            "A": {
+                "type": "concentration",
+                "species": "D-Glucose",
+                "start_val": "NULL"
+            },
+            "B": {
+                "type": "concentration",
+                "species": "ATP",
+                "start_val": "NULL"
+            },
+            "Kia": {
+                "type": "Kd",
+                "species": "D-Glucose",
+                "start_val": "99"
+            },
+            "Kb": {
+                "type": "Km",
+                "species": "ATP",
+                "start_val": "63"
+            },
+            "Ka": {
+                "type": "Km",
+                "species": "D-Glucose",
+                "start_val": "100"
+            },
+            "E": {
+                "type": "specific enz. activity",
+                "species": "NULL",
+                "start_val": "133"
+            },
+            "reIV": {
+                "type": "Vmax",
+                "species": "NULL",
+                "start_val": "100"
+            },
+            "reIV_Km": {
+                "type": "Vmax/Km",
+                "species": "ATP",
+                "start_val": "100"
+            }
+        }
+    },
+    {
+        "enzyme": "G6P Isomerase",
+        "substrate": "D-Gluctose 6-phosphate",
+        "product": "D-Fructose 6-phosphate",
+        "equation": "Vmax*A/(Km+A)",
+        "parameters": {
+            "A": {
+                "type": "concentration",
+                "species": "D-Gluctose 6-phosphate",
+                "start_val": "1300"
+            },
+            "Km": {
+                "type": "Km",
+                "species": "D-Gluctose 6-phosphate",
+                "start_val": "167"
+            },
+            "Vmax": {
+                "type": "Vmax",
+                "species": "NULL",
+                "start_val": "690000"
+            }
+        }
+    },
+    {
+        "enzyme": "PFK (irreversible)",
+        "substrate": "D-Fructose 6-phosphate",
+        "product": "D-Fructose 1,6-bisphosphate",
+        "equation": "(V*S^n)/(S_h^n+S^n)",
+        "parameters": {
+            "M1": {
+                "type": "concentration",
+                "species": "Phosphate",
+                "start_val": "25000"
+            },
+            "M2": {
+                "type": "concentration",
+                "species": "D-Fructose 2,6-bisphosphate",
+                "start_val": "20"
+            },
+            "S": {
+                "type": "concentration",
+                "species": "ATP",
+                "start_val": "3000"
+            },
+            "B": {
+                "type": "concentration",
+                "species": "D-Fructose 6-phosphate",
+                "start_val": "3000"
+            },
+            "n": {
+                "type": "Hill coefficient",
+                "species": "D-Fructose 6-phosphate",
+                "start_val": "1"
+            },
+            "S_h": {
+                "type": "S_half",
+                "species": "D-Fructose 6-phosphate",
+                "start_val": "140"
+            },
+            "V": {
+                "type": "Vmax",
+                "species": "NULL",
+                "start_val": "6980"
+            }
+        }
+    },
+    {
+        "enzyme": "Aldolase",
+        "substrate": "D-Fructose 1,6-bisphosphate",
+        "product": "DHAP",
+        "equation": "Vmax*S/(Km+S)",
+        "parameters": {
+            "S": {
+                "type": "concentration",
+                "species": "D-Fructose 1,6-bisphosphate",
+                "start_val": "20000"
+            },
+            "Km": {
+                "type": "Km",
+                "species": "D-Fructose 1,6-bisphosphate",
+                "start_val": "8500"
+            },
+            "Vmax": {
+                "type": "Vmax",
+                "species": "NULL",
+                "start_val": "3900"
+            }
+        }
+    },
+    {
+        "enzyme": "Triose phosphate isomerase",
+        "substrate": "DHAP",
+        "product": "D-Glyceraldehyde 3-phosphate",
+        "equation": "Vmax*S/(Km+S)",
+        "parameters": {
+            "S": {
+                "type": "concentration",
+                "species": "DHAP",
+                "start_val": "20000"
+            },
+            "kcat": {
+                "type": "kcat",
+                "species": "NULL",
+                "start_val": "6.5*10^4"
+            },
+            "Km": {
+                "type": "Km",
+                "species": "DHAP",
+                "start_val": "1200"
+            },
+            "Vmax": {
+                "type": "Vmax",
+                "species": "NULL",
+                "start_val": "9900"
+            }
+        }
+    },
+    {
+        "enzyme": "G3P dehydrogenase",
+        "substrate": "D-Glyceraldehyde 3-phosphate",
+        "product": "1,3-Biphospho-glycerate",
+        "equation": "1/(1/Vmax+(KmB/Vmax)*1/B+(KmA/Vmax)*1/A)",
+        "parameters": {
+            "A": {
+                "type": "concentration",
+                "species": "D-Glyceraldehyde 3-phosphate",
+                "start_val": "780"
+            },
+            "C": {
+                "type": "concentration",
+                "species": "Phosphate",
+                "start_val": "10000"
+            },
+            "B": {
+                "type": "concentration",
+                "species": "NAD+",
+                "start_val": "1000"
+            },
+            "KmB": {
+                "type": "Km",
+                "species": "NAD+",
+                "start_val": "90"
+            },
+            "KmA": {
+                "type": "Km",
+                "species": "D-Glyceraldehyde 3-phosphate",
+                "start_val": "210"
+            },
+            "Vmax": {
+                "type": "Vmax",
+                "species": "NULL",
+                "start_val": "99000"
+            }
+        }
+    },
+    {
+        "enzyme": "Phosphoglycerate kinase",
+        "substrate": "1,3-Biphospho-glycerate",
+        "product": "3-Phospho-D-glycerate",
+        "equation": "Vmax*B/(KmA+B)",
+        "parameters": {
+            "E": {
+                "type": "concentration",
+                "species": "Enzyme",
+                "start_val": "118.8"
+            },
+            "A": {
+                "type": "concentration",
+                "species": "ATP",
+                "start_val": "5000"
+            },
+            "B": {
+                "type": "concentration",
+                "species": "ADP",
+                "start_val": "50"
+            },
+            "KmA": {
+                "type": "Km",
+                "species": "ADP",
+                "start_val": "250"
+            },
+            "Vmax": {
+                "type": "Vmax",
+                "species": "NULL",
+                "start_val": "180000"
+            }
+        }
+    },
+    {
+        "enzyme": "Phosphoglyceromutase",
+        "substrate": "3-Phospho-D-glycerate",
+        "product": "2-Phospho-D-glycerate",
+        "equation": "GPM1*GPMkcat*(-P2G/(GPMKeq*GPMKp3g)+P3G/GPMKp3g)/(1+P2G/GPMKp2g+P3G/GPMKp3g)",
+        "parameters": {
+            "P2G": {
+                "type": "concentration",
+                "species": "2-Phospho-D-glycerate",
+                "start_val": "67.73791"
+            },
+            "P3G": {
+                "type": "concentration",
+                "species": "3-Phospho-D-glycerate",
+                "start_val": "469.825"
+            },
+            "GPM1": {
+                "type": "concentration",
+                "species": "Enzyme",
+                "start_val": "730.0003"
+            },
+            "GPMkcat": {
+                "type": "kcat",
+                "species": "NULL",
+                "start_val": "24000"
+            },
+            "GPMKeq": {
+                "type": "Keq",
+                "species": "NULL",
+                "start_val": "0.19"
+            },
+            "GPMKp2g": {
+                "type": "Km",
+                "species": "2-Phospho-D-glycerate",
+                "start_val": "1410"
+            },
+            "GPMKp3g": {
+                "type": "Km",
+                "species": "3-Phospho-D-glycerate",
+                "start_val": "1200"
+            }
+        }
+    },
+    {
+        "enzyme": "Enolase",
+        "substrate": "2-Phospho-D-glycerate",
+        "product": "Phosphoenolpyruvate",
+        "equation": "Vmax*A/(Km+A)",
+        "parameters": {
+            "E": {
+                "type": "concentration",
+                "species": "Enzyme",
+                "start_val": "0.9"
+            },
+            "A": {
+                "type": "concentration",
+                "species": "2-Phospho-D-glycerate",
+                "start_val": "2500000"
+            },
+            "Km": {
+                "type": "Km",
+                "species": "2-Phospho-D-glycerate",
+                "start_val": "5700000"
+            },
+            "Vmax": {
+                "type": "Vmax",
+                "species": "NULL",
+                "start_val": "0.27"
+            }
+        }
+    },
+    {
+        "enzyme": "Pyruvate kinase",
+        "substrate": "Phosphoenolpyruvate",
+        "product": "Pyruvate",
+        "equation": "Vmax*A/(Km+A)",
+        "parameters": {
+            "B": {
+                "type": "concentration",
+                "species": "Phosphoenolpyruvate",
+                "start_val": "2000"
+            },
+            "A": {
+                "type": "concentration",
+                "species": "ADP",
+                "start_val": "2000"
+            },
+            "M": {
+                "type": "concentration",
+                "species": "Fructose 1,6-bisphosphate",
+                "start_val": "1000"
+            },
+            "Km": {
+                "type": "Km",
+                "species": "Phosphoenolpyruvate",
+                "start_val": "300"
+            },
+            "Vmax": {
+                "type": "Vmax",
+                "species": "NULL",
+                "start_val": "4730"
+            }
+        }
+    },
+    {
+        "enzyme": "Pyruvate dehydrogenase complex",
+        "substrate": "Pyruvate",
+        "product": "Acetyl-CoA",
+        "equation": "Vmax*A/(Km+A)",
+        "parameters": {
+            "A": {
+                "type": "concentration",
+                "species": "Pyruvate",
+                "start_val": "2000"
+            },
+            "C": {
+                "type": "concentration",
+                "species": "Coenzyme A",
+                "start_val": "6500"
+            },
+            "B": {
+                "type": "concentration",
+                "species": "NAD+",
+                "start_val": "2500"
+            },
+            "Km": {
+                "type": "Km",
+                "species": "Pyruvate",
+                "start_val": "1"
+            },
+            "Vmax": {
+                "type": "Vmax",
+                "species": "NULL",
+                "start_val": "0.8"
+            }
+        }
+    }
+]
