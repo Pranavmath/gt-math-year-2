@@ -1,0 +1,679 @@
+Hexokinase,,,,
+substrate,D-Glucose,,,
+product,D-Gluctose 6-phosphate,,,
+Kinetic Law,,,,
+type,formula,,,
+Random Bi Bi,(reIV/100)*E*A*B/(Kia*Kb+Ka*B+Kb*A+A*B),,,
+Parameter,,,,
+name,type,species,start val.,unit
+M,concentration,Mg2+,NULL,
+A,concentration,D-Glucose,NULL,
+B,concentration,ATP,NULL,
+Kia,Kd,D-Glucose,99,μM
+Kb,Km,ATP,63,μM
+Ka,Km,D-Glucose,100,μM
+E,specific enz. activity,NULL,133,μM/min
+reIV,Vmax,NULL,100,%
+reIV_Km,Vmax/Km,ATP,100,%
+,,,,
+,,,,
+G6P Isomerase,,,,
+substrate,D-Gluctose 6-phosphate,,,
+product,D-Fructose 6-phosphate,,,
+Kinetic Law,,,,
+type,formula,,,
+Michaelis-Menten,Vmax*A/(Km+A),,,
+Parameter,,,,
+name,type,species,start val.,unit
+A,concentration,D-Gluctose 6-phosphate,1300,μM
+Km,Km,D-Gluctose 6-phosphate,167,μM
+Vmax,Vmax,NULL,690000,μM/min
+,,,,
+,,,,
+PFK (irreversible),,,,
+substrate,D-Fructose 6-phosphate,,,
+product,"D-Fructose 1,6-bisphosphate",,,
+Kinetic Law,,,,
+type,formula,,,
+Hill Cooperativity,(V*S^n)/(S_h^n+S^n),,,
+Parameter,,,,
+name,type,species,start val.,unit
+M1,concentration,Phosphate,25000,μM
+M2,concentration,"D-Fructose 2,6-bisphosphate",20,μM
+S,concentration,ATP,3000,μM
+B,concentration,D-Fructose 6-phosphate,3000,μM
+n,Hill coefficient,D-Fructose 6-phosphate,1,
+S_h,S_half,D-Fructose 6-phosphate,140,μM
+V,Vmax,NULL,6980,μM/min
+,,,,
+,,,,
+Aldolase,,,,
+substrate,"D-Fructose 1,6-bisphosphate",,,
+product,DHAP,,,
+Kinetic Law,,,,
+type,formula,,,
+Michaelis-Menten,Vmax*S/(Km+S),,,
+Parameter,,,,
+name,type,species,start val.,unit
+S,concentration,"D-Fructose 1,6-bisphosphate",20000,μM
+Km,Km,"D-Fructose 1,6-bisphosphate",8500,μM
+Vmax,Vmax,NULL,3900000,μmol/(min*mg)
+,,,,
+,,,,
+Triose phosphate isomerase,,,,
+substrate,DHAP,,,
+product,D-Glyceraldehyde 3-phosphate,,,
+Kinetic Law,,,,
+type,formula,,,
+Michaelis-Menten,Vmax*S/(Km+S),,,
+Parameter,,,,
+name,type,species,start val.,unit
+S,concentration,DHAP,20000,μM
+kcat,kcat,NULL,6.5*10^4,min^(-1)
+Km,Km,DHAP,1200,μM
+Vmax,Vmax,NULL,9900,μmol/(min*mg)
+,,,,
+,,,,
+G3P dehydrogenase,,,,
+substrate,D-Glyceraldehyde 3-phosphate,,,
+product,"1,3-Biphospho-glycerate",,,
+Kinetic Law,,,,
+type,formula,,,
+,1/(1/Vmax+(KmB/Vmax)*1/B+(KmA/Vmax)*1/A),,,
+Parameter,,,,
+name,type,species,start val.,unit
+A,concentration,D-Glyceraldehyde 3-phosphate,780,μM
+C,concentration,Phosphate,10000,μM
+B,concentration,NAD+,1000,μM
+KmB,Km,NAD+,90,μM
+KmA,Km,D-Glyceraldehyde 3-phosphate,210,μM
+Vmax,Vmax,NULL,99000,μmol/(min*mg)
+,,,,
+,,,,
+Phosphoglycerate kinase,,,,
+substrate,"1,3-Biphospho-glycerate",,,
+product,3-Phospho-D-glycerate,,,
+Kinetic Law,,,,
+type,formula,,,
+Micahelis-Menten,Vmax*B/(KmA+B),,,
+Parameter,,,,
+name,type,species,start val.,unit
+E,concentration,Enzyme,118.8,μg/ml
+A,concentration,ATP,5000,μM
+B,concentration,ADP,50,μM
+KmA,Km,ADP,250,μM
+Vmax,Vmax,NULL,180000,μmol/(min*mg)
+,,,,
+,,,,
+Phosphoglyceromutase,,,,
+substrate,3-Phospho-D-glycerate,,,
+product,2-Phospho-D-glycerate,,,
+Kinetic Law,,,,
+type,formula,,,
+,GPM1*GPMkcat*(-P2G/(GPMKeq*GPMKp3g)+P3G/GPMKp3g)/(1+P2G/GPMKp2g+P3G/GPMKp3g),,,
+Parameter,,,,
+name,type,species,start val.,unit
+P2G,concentration,2-Phospho-D-glycerate,67.73791,μM
+P3G,concentration,3-Phospho-D-glycerate,469.825,μM
+GPM1,concentration,Enzyme,730.0003,μM
+GPMkcat,kcat,NULL,24000,min^(-1)
+GPMKeq,Keq,NULL,0.19,NULL
+GPMKp2g,Km,2-Phospho-D-glycerate,1410,μM
+GPMKp3g,Km,3-Phospho-D-glycerate,1200,μM
+,,,,
+,,,,
+Enolase,,,,
+substrate,2-Phospho-D-glycerate,,,
+product,Phosphoenolpyruvate,,,
+Kinetic Law,,,,
+type,formula,,,
+Micahelis-Menten,Vmax*A/(Km+A),,,
+Parameter,,,,
+name,type,species,start val.,unit
+E,concentration,Enzyme,0.9,μg/ml
+A,concentration,2-Phospho-D-glycerate,2500000,μM
+Km,Km,2-Phospho-D-glycerate,5700000,μM
+Vmax,Vmax,NULL,0.27,%
+,,,,
+,,,,
+Pyruvate kinase,,,,
+substrate,Phosphoenolpyruvate,,,
+product,Pyruvate,,,
+Kinetic Law,,,,
+type,formula,,,
+Michaelis-Menten,Vmax*A/(Km+A),,,
+Parameter,,,,
+name,type,species,start val.,unit
+B,concentration,Phosphoenolpyruvate,2000,μM
+A,concentration,ADP,2000,μM
+M,concentration,"Fructose 1,6-bisphosphate",1000,μM
+Km,Km,Phosphoenolpyruvate,300,μM
+Vmax,Vmax,NULL,4730,μmol/(min*mg)
+,,,,
+,,,,
+Pyruvate dehydrogenase complex,,,,
+substrate,Pyruvate,,,
+product,Acetyl-CoA,,,
+Kinetic Law,,,,
+type,formula,,,
+Michaelis-Menten,Vmax*A/(Km+A),,,
+Parameter,,,,
+name,type,species,start val.,unit
+A,concentration,Pyruvate,2000,μM
+C,concentration,Coenzyme A,6500,μM
+B,concentration,NAD+,2500,μM
+Km,Km,Pyruvate,1,μM
+Vmax,Vmax,NULL,0.8,μmol/(min*mg)
+,,,,
+,,,,
+Acetyle-CoA carboxylase,,,,
+substrate,Acetyl-CoA,,,
+product,Holo-[acy-carrier protein],,,
+Kinetic Law,,,,
+type,formula,,,
+Sequential ordered Ter Ter,(E*A*B*C)/(Phi_0*A*B*C+Phi_a*B*C+Phi_b*A*C+Phi_c*A*B+Phi_ab*C+Phi_bc*A+Phi_ac*B+Phi_abc),,,
+Parameter,,,,
+name,type,species,start val.,unit
+Z,concentration,Citrate,10000,μM
+C,concentration,Acetyl-CoA,4,μM
+E,concentration,Enzyme,0.014,μM
+B,concentration,Hydrogencarbonate,200,μM
+A,concentration,ATP,10,μM
+Phi_a,NULL,ATP,0.0353,μM*min
+Phi_b,NULL,Hydrogencarbonate,0.32,μM*min
+Phi_c,NULL,Acetyl-CoA,0.00328,μM*min
+Phi_0,NULL,NULL,4.53*10^(-4),min
+Phi_bc,NULL,NULL,6.1*10^(-12),M^2*min
+Phi_ab,NULL,NULL,2*10^(-11),M^2*min
+Phi_ac,NULL,NULL,NULL,NULL
+Phi_abc,NULL,NULL,4.1*10^(-15),M^3*min
+,,,,
+,,,,
+Malonyl transacylase,,,,
+substrate,Holo-[acy-carrier protein],,,
+product,Acetyl-CoA,,,
+Kinetic Law,,,,
+type,formula,,,
+Ping Pong Bi Bi,(kcat*E*A*B)/(Km_A*B + Km_B*A + A*B),,,
+Parameter,,,,
+name,type,species,start val.,unit
+A,concentration,Acetyl-CoA,400,μM
+B,concentration,Holo-[acyl-carrier protein],400,μM
+E,concentration,Enzyme,0.5,μM
+kcat,kcat,NULL,7.8,min^(-1)
+kcat_Km_A,kcat/Km,Acetyl-CoA,0.006,μM^(-1)*min^(-1)
+kcat_Km_B,kcat/Km,Holo-[acy-carrier protein],0.0096,μM^(-1)*min^(-1)
+Km_A,Km,Acetyl-CoA,1250,μM
+Km_B,Km,Holo-[acyl-carrier protein],1013,μM
+,,,,
+,,,,
+Acetyl transacylase,,,,
+substrate,Acetyl-CoA,,,
+product,Acetyl-[acyl-carrier protein],,,
+Kinetic Law,,,,
+type,formula,,,
+NULL,Vmax*S/(Km+S),,,
+Parameter,,,,
+name,type,species,start val.,unit
+S,concentration,Acetyl-CoA,1,μM
+B,concentration,Holo-[acyl-carrier protein],180,μM
+E,concentration,Enzyme,35,"​
+ μg/ml"
+kcat,kcat,NULL,3.05,min^(-1)
+Km,Km,Acetyl-CoA,4.3,μM
+Vmax,Vmax,NULL,0.064,μmol/(min*mg)
+,,,,
+,,,,
+Condensation (2.3.1.41),,,,
+substrate,Acetyl-[acyl-carrier protein],,,
+product,Acetoacetyl-CoA,,,
+Kinetic Law,,,,
+type,formula,,,
+Michaelis-Menten,Vmax*A/(Km+A),,,
+Parameter,,,,
+name,type,species,start val.,unit
+E,concentration,Enzyme,0.027,​μM
+A,concentration,Acetyl-[acyl-carrier protein],1,μM
+Km,Km,Acetyl-[acyl-carrier protein],50,μM
+Vmax,Vmax,NULL,0.25,"​
+ μmol/(min*mg)"
+,,,,
+,,,,
+Reduction 1-1,,,,
+substrate,Acetoacetyl-CoA,,,
+product,Acetoacetyl-CoA,,,
+Kinetic Law,,,,
+type,formula,,,
+Michaelis-Menten,E*kcat*B/(Km+B),,,
+Parameter,,,,
+name,type,species,start val.,unit
+E,concentration,Enzyme,0.16,​μM
+A,concentration,NADPH,800,μM
+B,concentration,Acetoacetyl-CoA,0.5,μM
+kcat,kcat,NULL,26,min^(-1)
+kcat_Km,kcat/Km,Acetoacetyl-CoA,22,μM^(-1)*min^(-1)
+Km,Km,Acetoacetyl-CoA,1.2,μM
+,,,,
+,,,,
+Reduction 1-2,,,,
+substrate,Acetoacetyl-CoA,,,
+product,But-2-enoyl-[acyl-carrier protein],,,
+Kinetic Law,,,,
+type,formula,,,
+NULL,Vmax*B/(Km+B),,,
+Parameter,,,,
+name,type,species,start val.,unit
+E,concentration,Enzyme,0.16,​μM
+A,concentration,NADPH,800,μM
+B,concentration,Acetoacetyl-CoA,0.5,μM
+kcat,kcat,NULL,26,min^(-1)
+kcat_Km,kcat/Km,Acetoacetyl-CoA,22,μM^(-1)*min^(-1)
+Km,Km,Acetoacetyl-CoA,1.2,μM
+,,,,
+,,,,
+Dehydration 1,,,,
+substrate,But-2-enoyl-[acyl-carrier protein],,,
+product,Crotonoyl-CoA,,,
+Kinetic Law,,,,
+type,formula,,,
+NULL,Vmax*S/(Km+S),,,
+Parameter,,,,
+name,type,species,start val.,unit
+S,concentration,But-2-enoyl-[acyl-carrier protein],17,μM
+E,concentration,Enzyme,0.105,μg/ml
+Km,Km,But-2-enoyl-[acyl-carrier protein],9.7,μM
+Vmax,Vmax,NULL,48.2,μmol/(min*mg)
+,,,,
+,,,,
+Reduction 2-1,,,,
+substrate,Crotonoyl-CoA,,,
+product,Butyryl-[acp],,,
+Kinetic Law,,,,
+type,formula,,,
+Michaelis-Menten,kcat*E*A/(Km+A),,,
+Parameter,,,,
+name,type,species,start val.,unit
+E,concentration,Enzyme,NULL,NULL
+B,concentration,Crotonoyl-CoA,100,μM
+A,concentration,NADH,NULL,NULL
+kcat,kcat,NULL,54,min^(-1)
+Km,Km,NADH,35,μM
+,,,,
+,,,,
+Condensation 1,,,,
+substrate,Butyryl-[acp],,,
+product,(S)-3-Hydroxyhexanoyl-CoA,,,
+Kinetic Law,,,,
+type,formula,,,
+Michaelis-Menten,Vmax*A/(Km+A),,,
+Parameter,,,,
+name,type,species,start val.,unit
+A,concentration,Butyryl-[acp],1,μM
+E,concentration,Enzyme,0.027,μM
+kcat_Km,kcat/Km,Butyryl-[acp],1.52*10^(-6),μM^(-1)*min^(-1)
+Km,Km,Butyryl-[acp],3.9,μM
+Vmax,Vmax,NULL,0.129,μmol/(min*mg)
+,,,,
+,,,,
+Reduction 1-3,,,,
+substrate,(S)-3-Hydroxyhexanoyl-CoA,,,
+product,trans-Hex-2-enoyl-[acp],,,
+Kinetic Law,,,,
+type,formula,,,
+NULL,Vmax*S/(Km+S),,,
+Parameter,,,,
+name,type,species,start val.,unit
+S,concentration,(S)-3-Hydroxyhexanoyl-CoA,NULL,NULL
+A,concentration,NAD+,1000,μM
+Km,Km,(S)-3-Hydroxyhexanoyl-CoA,28.6,μM
+Vmax,Vmax,NULL,308000000,µmol/(min·mg)
+,,,,
+,,,,
+Dehydration 1,,,,
+substrate,trans-Hex-2-enoyl-[acp],,,
+product,trans-Hex-2-enoyl-[acp],,,
+Kinetic Law,,,,
+type,formula,,,
+NULL,Vmax*S/(Km+S),,,
+Parameter,,,,
+name,type,species,start val.,unit
+E,concentration,Enzyme,0.105,μg/ml
+S,concentration,trans-Hex-2-enoyl-[acp],17,μM
+Km,Km,trans-Hex-2-enoyl-[acp],6.2,μM
+Vmax,Vmax,NULL,52.7,μmol/(min*mg)
+,,,,
+,,,,
+Reduction 2-2,,,,
+substrate,trans-Hex-2-enoyl-[acp],,,
+product,Hexanoyl-[acp],,,
+Kinetic Law,,,,
+type,formula,,,
+NULL,Vmax*S/(Km+S),,,
+Parameter,,,,
+name,type,species,start val.,unit
+E,concentration,Enzyme,0.25,μg/ml
+S,concentration,trans-Hex-2-enoyl-[acp],17,μM
+B,concentration,NADH,200,μM
+Km,Km,trans-Hex-2-enoyl-[acp],1.3,μM
+Vmax,Vmax,NULL,79,μmol/(min*mg)
+,,,,
+,,,,
+Condensation 2,,,,
+substrate,Hexanoyl-[acp],,,
+product,3-Oxooctanoyl-CoA,,,
+Kinetic Law,,,,
+type,formula,,,
+Michaelis-Menten,Vmax*A/(Km+A),,,
+Parameter,,,,
+name,type,species,start val.,unit
+A,concentration,Hexanoyl-[acp],1,μM
+E,concentration,Enzyme,0.027,μM
+kcat_Km,kcat/Km,Hexanoyl-[acp],5.88*10^(-6),μM^(-1)*min^(-1)
+Km,Km,Hexanoyl-[acp],1.9,μM
+Vmax,Vmax,NULL,0.241,μmol/(min*mg)
+,,,,
+,,,,
+Reduction 1-4,,,,
+substrate,3-Oxooctanoyl-CoA,,,
+product,trans-Oct-2-enoyl-[acp],,,
+Kinetic Law,,,,
+type,formula,,,
+Michaelis-Menten,Vmax*A/(Km+A),,,
+Parameter,,,,
+name,type,species,start val.,unit
+S2,concentration,NADH,100,μM
+S1,concentration,3-Oxooctanoyl-CoA,20,μM
+E,concentration,Enzyme,NULL,NULL
+kcat,kcat,NULL,1680,min^(-1)
+Km,Km,NADH,10,μM
+,,,,
+,,,,
+Dehydration 2,,,,
+substrate,trans-Oct-2-enoyl-[acp],,,
+product,trans-Oct-2-enoyl-[acp],,,
+Kinetic Law,,,,
+type,formula,,,
+NULL,Vmax*S/(Km+S),,,
+Parameter,,,,
+name,type,species,start val.,unit
+S,concentration,trans-Oct-2-enoyl-[acp],12,μM
+E,concentration,Enzyme,0.105,μg/ml
+Km,Km,trans-Oct-2-enoyl-[acp],13.3,μM
+Vmax,Vmax,NULL,109.3,μmol/(min*mg)
+,,,,
+,,,,
+Reduction 2-3,,,,
+substrate,trans-Oct-2-enoyl-[acp],,,
+product,Octanoyl-[acp],,,
+Kinetic Law,,,,
+type,formula,,,
+NULL,Vmax*S/(Km+S),,,
+Parameter,,,,
+name,type,species,start val.,unit
+B,concentration,NADH,200,μM
+E,concentration,Enzyme,0.25,μg/ml
+S,concentration,trans-Oct-2-enoyl-[acp],12,μM
+Km,Km,trans-Oct-2-enoyl-[acp],1.8,μM
+Vmax,Vmax,NULL,74.1,μmol/(min*mg)
+,,,,
+,,,,
+Condensation 3,,,,
+substrate,Octanoyl-[acp],,,
+product,(S)-3-Hydroxydecanoyl-CoA,,,
+Kinetic Law,,,,
+type,formula,,,
+Michaelis-Menten,Vmax*A/(Km+A),,,
+Parameter,,,,
+name,type,species,start val.,unit
+A,concentration,Octanoyl-[acp],1,μM
+E,concentration,Enzyme,0.027,μM
+kcat_Km,kcat/Km,Octanoyl-[acp],1.1*10^(-6),μM^(-1)*min^(-1)
+Km,Km,Octanoyl-[acp],10.9,μM
+Vmax,Vmax,NULL,0.271,μmol/(min*mg)
+,,,,
+,,,,
+Reduction 1-5,,,,
+substrate,(S)-3-Hydroxydecanoyl-CoA,,,
+product,trans-Dec-2-enoyl-[acp],,,
+Kinetic Law,,,,
+type,formula,,,
+Michaelis-Menten,Vmax*A/(Km+A),,,
+Parameter,,,,
+name,type,species,start val.,unit
+S,concentration,(S)-3-Hydroxydecanoyl-CoA,NULL,NULL
+A,concentration,NAD+,1000,μM
+Km,Km,(S)-3-Hydroxydecanoyl-CoA,8.8,μM
+Vmax,Vmax,NULL,256000,µmol/(min·g)
+,,,,
+,,,,
+Dehydration 3,,,,
+substrate,trans-Dec-2-enoyl-[acp],,,
+product,trans-Dec-2-enoyl-[acp],,,
+Kinetic Law,,,,
+type,formula,,,
+NULL,Vmax*S/(Km+S),,,
+Parameter,,,,
+name,type,species,start val.,unit
+E,concentration,Enzyme,0.105,μg/ml
+S,concentration,trans-Dec-2-enoyl-[acp],17,μM
+Km,Km,trans-Dec-2-enoyl-[acp],5.5,μM
+Vmax,Vmax,NULL,40.6,μmol/(min*mg)
+,,,,
+,,,,
+Reduction 2-4,,,,
+substrate,trans-Dec-2-enoyl-[acp],,,
+product,Decanoyl-[acp],,,
+Kinetic Law,,,,
+type,formula,,,
+NULL,Vmax*S/(Km+S),,,
+Parameter,,,,
+name,type,species,start val.,unit
+S,concentration,trans-Dec-2-enoyl-[acp],17,μM
+E,concentration,Enzyme,0.25,μg/ml
+B,concentration,NADH,200,μM
+Km,Km,trans-Dec-2-enoyl-[acp],1.1,μM
+Vmax,Vmax,NULL,26.8,μmol/(min*mg)
+,,,,
+,,,,
+Condensation 4,,,,
+substrate,Decanoyl-[acp],,,
+product,trans-Dodec-2-enoyl-[acp],,,
+Kinetic Law,,,,
+type,formula,,,
+Michaelis-Menten,Vmax*A/(Km+A),,,
+Parameter,,,,
+name,type,species,start val.,unit
+E,concentration,Enzyme,0.027,μM
+A,concentration,Decanoyl-[acp],1,μM
+kcat_Km,kcat/Km,Decanoyl-[acp],9.18*10^(-6),μM^(-1)*min^(-1)
+Km,Km,Decanoyl-[acp],1.8,μM
+Vmax,Vmax,NULL,0.364,μmol/(min*mg)
+,,,,
+,,,,
+Reduction 1-6,,,,
+substrate,trans-Dodec-2-enoyl-[acp],,,
+product,trans-Dodec-2-enoyl-[acp],,,
+Kinetic Law,,,,
+type,formula,,,
+NULL,Vmax*S/(Km+S),,,
+Parameter,,,,
+name,type,species,start val.,unit
+S,concentration,trans-Dodec-2-enoyl-[acp],17,μM
+B,concentration,NADH,200,μM
+E,concentration,Enzyme,0.25,μg/ml
+Km,Km,trans-Dodec-2-enoyl-[acp],5,μM
+Vmax,Vmax,NULL,37.5,μmol/(min*mg)
+,,,,
+,,,,
+Dehydration 4,,,,
+substrate,trans-Dodec-2-enoyl-[acp],,,
+product,trans-Dodec-2-enoyl-[acp],,,
+Kinetic Law,,,,
+type,formula,,,
+NULL,Vmax*S/(Km+S),,,
+Parameter,,,,
+name,type,species,start val.,unit
+E,concentration,Enzyme,0.105,μg/ml
+S,concentration,trans-Dodec-2-enoyl-[acp],15,μM
+Km,Km,trans-Dodec-2-enoyl-[acp],3.1,μM
+Vmax,Vmax,NULL,21.9,μmol/(min*mg)
+,,,,
+,,,,
+Reduction 2-5,,,,
+substrate,trans-Dodec-2-enoyl-[acp],,,
+product,Dodecanoyl-[acyl-carrier protein],,,
+Kinetic Law,,,,
+type,formula,,,
+NULL,Vmax*S/(Km+S),,,
+Parameter,,,,
+name,type,species,start val.,unit
+S,concentration,trans-Dodec-2-enoyl-[acp],17,μM
+B,concentration,NADH,200,μM
+E,concentration,Enzyme,0.25,μg/ml
+Km,Km,trans-Dodec-2-enoyl-[acp],5,μM
+Vmax,Vmax,NULL,37.5,μmol/(min*mg)
+,,,,
+,,,,
+Condensation 5,,,,
+substrate,Dodecanoyl-[acyl-carrier protein],,,
+product,3-Oxotetradecanoyl-CoA,,,
+Kinetic Law,,,,
+type,formula,,,
+Michaelis-Menten,Vmax*A/(Km+A),,,
+Parameter,,,,
+name,type,species,start val.,unit
+E,concentration,Enzyme,0.027,μM
+A,concentration,Dodecanoyl-[acyl-carrier protein],1,μM
+kcat_Km,kcat/Km,Dodecanoyl-[acyl-carrier protein],5.05*10^(-6),μM^(-1)*min^(-1)
+Km,Km,Dodecanoyl-[acyl-carrier protein],9.5,μM
+Vmax,Vmax,NULL,1.045,μmol/(min*mg)
+,,,,
+,,,,
+Reduction 1-7,,,,
+substrate,3-Oxotetradecanoyl-CoA,,,
+product,(3R)-3-Hydroxytetradecanoyl-[acyl-carrier protein],,,
+Kinetic Law,,,,
+type,formula,,,
+NULL,Vmax*S1/(Km+S1),,,
+Parameter,,,,
+name,type,species,start val.,unit
+S2,concentration,NADH,100,μg/ml
+S1,concentration,3-Oxotetradecanoyl-CoA,40,μM
+Vmax,Vmax,NULL,15,μmol/(min*mg)
+Km,Km,3-Oxotetradecanoyl-CoA,0.001,μM
+,,,,
+,,,,
+Dehydration 5,,,,
+substrate,(3R)-3-Hydroxytetradecanoyl-[acyl-carrier protein],,,
+product,Tetradecanoyl-[acp],,,
+Kinetic Law,,,,
+type,formula,,,
+Michaelis-Menten,kcat*E*S/(Km+S),,,
+Parameter,,,,
+name,type,species,start val.,unit
+E,concentration,Enzyme,0.0001,μM
+S,concentration,(3R)-3-Hydroxytetradecanoyl-[acyl-carrier protein],NULL,NULL
+kcat,kcat,NULL,1380,min^(-1)
+Km,Km,(3R)-3-Hydroxytetradecanoyl-[acyl-carrier protein],3.2,μM
+,,,,
+,,,,
+Reduction 2-6,,,,
+substrate,Tetradecanoyl-[acp],,,
+product,Tetradecanoyl-[acp],,,
+Kinetic Law,,,,
+type,formula,,,
+Michaelis-Menten,(E*kcat)*A/(Km+A),,,
+Parameter,,,,
+name,type,species,start val.,unit
+A,concentration,Tetradecanoyl-[acp],10,μM
+E,concentration,Enzyme,0.25,μM
+kcat,kcat,NULL,3.6,min^(-1)
+kcat_Km,kcat/Km,Tetradecanoyl-[acp],0.3,μM^(-1)*min^(-1)
+Km,Km,Tetradecanoyl-[acp],12,μM
+,,,,
+,,,,
+Condensation 6,,,,
+substrate,Tetradecanoyl-[acp],,,
+product,trans-Hex-2-enoyl-[acp],,,
+Kinetic Law,,,,
+type,formula,,,
+Michaelis-Menten,Vmax*A/(Km+A),,,
+Parameter,,,,
+name,type,species,start val.,unit
+A,concentration,Tetradecanoyl-[acp],1,μM
+E,concentration,Enzyme,0.027,μM
+kcat_Km,kcat/Km,Tetradecanoyl-[acp],100000,μM^(-1)*min^(-1)
+Km,Km,Tetradecanoyl-[acp],50.8,μM
+Vmax,Vmax,NULL,0.115,μmol/(min*mg)
+,,,,
+,,,,
+Reduction 1-8,,,,
+substrate,trans-Hex-2-enoyl-[acp],,,
+product,trans-Hexadec-2-enoyl-[acp],,,
+Kinetic Law,,,,
+type,formula,,,
+NULL,Vmax*S/(Km+S),,,
+Parameter,,,,
+name,type,species,start val.,unit
+E,concentration,Enzyme,0.105,μg/ml
+S,concentration,trans-Hex-2-enoyl-[acp],17,μM
+Km,Km,trans-Hex-2-enoyl-[acp],6.2,μM
+Vmax,Vmax,NULL,52.7,μmol/(min*mg)
+,,,,
+,,,,
+Dehydration 6,,,,
+substrate,trans-Hexadec-2-enoyl-[acp],,,
+product,3-Hydroxypalmitoyl-CoA,,,
+Kinetic Law,,,,
+type,formula,,,
+NULL,Vmax*S/(Km+S),,,
+Parameter,,,,
+name,type,species,start val.,unit
+S,concentration,trans-Hexadec-2-enoyl-[acp],15,μM
+E,concentration,Enzyme,0.105,μg/ml
+Km,Km,trans-Hexadec-2-enoyl-[acp],2.9,μM
+Vmax,Vmax,NULL,20.3,μmol/(min*mg)
+,,,,
+,,,,
+Reduction 2-7,,,,
+substrate,3-Hydroxypalmitoyl-CoA,,,
+product,Palmitoleoyl-CoA,,,
+Kinetic Law,,,,
+type,formula,,,
+NULL,Vmax*S/(Km+S),,,
+Parameter,,,,
+name,type,species,start val.,unit
+S,concentration,3-Hydroxypalmitoyl-CoA,10000,μM
+A,specific enz. activity,NULL,0.021,μmol/(min*mg)
+Km,Km,3-Hydroxypalmitoyl-CoA,0.001,μM
+Vmax,Vmax,NULL,1.5,μmol/(min*mg)
+,,,,
+,,,,
+THEN,,,,
+substrate,Palmitoleoyl-CoA,,,
+product,Palmitoyl-CoA,,,
+Kinetic Law,,,,
+type,formula,,,
+Michaelis-Menten,E*kcat*A/(Km+A),,,
+Parameter,,,,
+name,type,species,start val.,unit
+E,concentration,Enzyme,NULL,NULL
+A,concentration,Palmitoleic acid,10,μM
+kcat,kcat,NULL,6360,min^(-1)
+kcat_Km,kcat/Km,Palmitoleoyl-CoA,120,μM^(-1)*min^(-1)
+Km,Km,Palmitoleoyl-CoA,58,μM
+,,,,
+,,,,
+FINALLY,,,,
+substrate,Palmitoyl-CoA,,,
+product,,,,
+Kinetic Law,,,,
+type,formula,,,
+Michaelis-Menten,E*kcat*A/(Km+A),,,
+Parameter,,,,
+name,type,species,start val.,unit
+E,concentration,Enzyme,NULL,NULL
+A,concentration,Palmitoyl-CoA,10,μM
+kcat,kcat,NULL,9180,min^(-1)
+kcat_Km,kcat/Km,Palmitoyl-CoA,420,μM^(-1)*min^(-1)
+Km,Km,Palmitoyl-CoA,23,μM

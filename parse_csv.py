@@ -95,11 +95,11 @@ def parse_csv(filename):
 
 if __name__ == '__main__':
     # Replace 'input.csv' with your CSV file path.
-    filename = "glycolysis.csv"
+    filename = "entire.csv"
     enzyme_list = parse_csv(filename)
     
     # Print the output in JSON format for clarity.
-    with open("glycolysis.json", "w") as f:
+    with open("entire.json", "w") as f:
         json.dump(enzyme_list, f, indent=4)
     
     #print(json.dumps(enzyme_list, indent=4))

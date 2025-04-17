@@ -5,27 +5,30 @@ import numpy as np
 import scipy
 from tqdm import tqdm
 import matplotlib.pyplot as plt
+from time import time
 
 """
 MAKE SURE THAT FOR THE JSON:
     1. THE SYMBOLS USED IN THE EQUATION ARE ALL IN THE PARAMETERS
     2. THE EQUATION IS FORMATED CORRECTLY
+    3. VARIABLES LIKE HILL CONSTANT SHOULDN'T BE NULL OR ELSE THEY WILL BE SET TO 100 IN THE CODE
 """
 
 # default value if anything is NULL
 DEFAULT_VALUE = 100
 
-with open("glycolysis.json") as f:
+with open("entire.json") as f:
     data = json.load(f)
 
 
-tracking_variables = ["ATP", "ADP"]
+tracking_variables = ["ATP", "ADP", "NADH", "NADPH"]
 
 for chunk in data:
     substrate, product = chunk["substrate"], chunk["product"]
     tracking_variables += [substrate, product]
 
 tracking_variables = list(set(tracking_variables))
+
 
 print(tracking_variables)
 intial_values = [DEFAULT_VALUE for _ in range(len(tracking_variables))]
@@ -61,7 +64,7 @@ for chunk in data:
         if value_symbol == "NULL" or type_symbol == "concentration":
             value_symbol = DEFAULT_VALUE
         else:
-            value_symbol = float(value_symbol)
+            value_symbol = float(sp.sympify(value_symbol))
 
 
         # not a constant since we are tracking that over time
@@ -108,13 +111,19 @@ def modeling(t, concentrations):
     return np.array(changes)
 
 
+print("Parsing Done!")
 
 
-NUM_ITER = 50
+NUM_ITER = 20
 t = np.linspace(0, NUM_ITER, NUM_ITER * 10)
 
+
+begin = time()
 sol = scipy.integrate.solve_ivp(modeling, [0, NUM_ITER], intial_values, method="LSODA", dense_output=True)
 z = sol.sol(t)
+end = time()
+
+print(f"Solving Done: seconds per iter: {(end-begin)/NUM_ITER}")
 
 for idx, metabolite in enumerate(tracking_variables):
     datapoints = z[idx]
@@ -138,3 +147,6 @@ for idx, metabolite in enumerate(tracking_variables):
     
     # Clear figure for the next plot
     plt.clf()
+
+
+palmitoyl_coa = z[tracking_variables.index("Palmitoyl-CoA")]
