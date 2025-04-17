@@ -114,7 +114,7 @@ def modeling(t, concentrations):
 print("Parsing Done!")
 
 
-NUM_ITER = 20
+NUM_ITER = 50
 t = np.linspace(0, NUM_ITER, NUM_ITER * 10)
 
 
@@ -150,3 +150,5 @@ for idx, metabolite in enumerate(tracking_variables):
 
 
 palmitoyl_coa = z[tracking_variables.index("Palmitoyl-CoA")]
+np.save("palmitoyl-coa.npy", palmitoyl_coa)
+np.save("time.npy", t)
