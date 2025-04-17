@@ -5,6 +5,7 @@ import numpy as np
 import scipy
 from tqdm import tqdm
 import matplotlib.pyplot as plt
+import matplotlib.ticker as ticker 
 from time import time
 
 """
@@ -135,6 +136,7 @@ for idx, metabolite in enumerate(tracking_variables):
     plt.title(f"Comparison for {metabolite}", fontsize=16, fontweight='bold')
     plt.xlabel("Iteration", fontsize=14)
     plt.ylabel(r'Concentration ($\mu$M)', fontsize=14)
+    plt.yticks(np.arange(100, 400, 10)) 
 
     # Enable grid for better readability of the plot
     plt.grid(True, linestyle='--', alpha=0.7)
@@ -149,6 +151,21 @@ for idx, metabolite in enumerate(tracking_variables):
     plt.clf()
 
 
-palmitoyl_coa = z[tracking_variables.index("Palmitoyl-CoA")]
-np.save("palmitoyl-coa.npy", palmitoyl_coa)
-np.save("time.npy", t)
+palmitic = z[tracking_variables.index("Palmitic Acid")]
+
+# it is linear after around 20 seconds
+initial_time = 20
+initial_time_idx = (np.abs(t - initial_time)).argmin()
+initial_time = t[initial_time_idx]
+
+print(f"intital time: {initial_time}")
+
+final_time = t[-1]
+
+initial_palmitic = palmitic[initial_time_idx]
+final_palmitic = palmitic[-1]
+
+slope = (final_palmitic-initial_palmitic)/(final_time-initial_time)
+
+print(f"slope: {slope}")
+print(f"concentration at intital time: {initial_palmitic}")
