@@ -11,23 +11,25 @@ INITIAL_PALMITIC = 327.06
 
 
 DELTA_T = 0.1
-D_p = 1
-KOFF = 10.75
+D_p = 0.01
 AREA_SQUARE = 1
-SIGMA = 3
-KON_BASE = 100
-HILL = 1.5
-N = 5
 k_depal_max = 0.015
 Km_depal = 89
 
+# these don't matter
+KON_BASE = 100
+KOFF = 10.75
+SIGMA = 3
+HILL = 1.5
+N = 5
+
 # initial time at which palmitic reachs linear behaviour and we start this simulation 
-INITIAL_TIME = 20
-FINAL_TIME = 320
+INITIAL_TIME = 0
+FINAL_TIME = 1000
 times = np.arange(INITIAL_TIME, FINAL_TIME, DELTA_T)
 
 # grid side size
-GRID_SIZE = 200
+GRID_SIZE = 50
 
 """
 Grid code now
@@ -50,7 +52,7 @@ colors[golgi] = LIGHT_RED
 outside_indices = [(i, j) for i in range(GRID_SIZE) for j in range(GRID_SIZE) if not (i == center_grid and j == center_grid)]
 
 # choose a random # for lipid rafts (30-1800ish depending on density)
-num_rafts = 1000
+num_rafts = 0
 
 # list of (xi, yi)
 rafts = np.random.choice(len(outside_indices), num_rafts, replace=False)
@@ -74,6 +76,7 @@ Rc = 100
 
 def laplacian_rp(u, v):
     
+    # might not always be 4 at the edge
     total = -4 * Rp[v, u]
 
     for (i, j) in [(u+1, v), (u-1, v), (u, v+1), (u, v-1)]:
@@ -82,6 +85,16 @@ def laplacian_rp(u, v):
     
     # if AREA_SQUARE is too small than the laplacian_rp is magnified too much so change * delta_t decreases Rp below 0
     return total / AREA_SQUARE
+
+def compute_laplacian_slicing(Rp):
+    laplacian = np.zeros_like(Rp)
+    laplacian[1:-1, 1:-1] = (
+        Rp[1:-1, 2:] + Rp[1:-1, :-2] +
+        Rp[2:, 1:-1] + Rp[:-2, 1:-1] -
+        4 * Rp[1:-1, 1:-1]
+    )
+    return laplacian / AREA_SQUARE
+
 
 def kon(raft_idx):
     xi, yi = rafts[raft_idx]
@@ -107,12 +120,16 @@ for t in tqdm(times):
     if t < 50:
         Rp[center_grid, center_grid] = 1000
 
-    palmitic_acid = (t - INITIAL_TIME) * PALMITIC_RATE + INITIAL_PALMITIC
+    palmitic_acid = (t - INITIAL_TIME)/60 * PALMITIC_RATE + INITIAL_PALMITIC
 
+    """
     Rp_change = np.array([
         [(D_p * laplacian_rp(u, v) - k_depal(palmitic_acid) * Rp[v, u]) for v in range(GRID_SIZE)]
         for u in range(GRID_SIZE)
     ])
+    """
+    
+    Rp_change = D_p * compute_laplacian_slicing(Rp) - k_depal(palmitic_acid) * Rp
 
 
     Rr_change = np.zeros(num_rafts)
@@ -126,20 +143,20 @@ for t in tqdm(times):
         Rr_change[raft_idx] = -total
 
     # clipping rp for conservation of matter
-    """
+    #"""
     previous_sum = np.sum(Rp_change)
     Rp_change = np.maximum(Rp_change, -Rp/DELTA_T)
     new_sum = np.sum(Rp_change)
     assert new_sum >= previous_sum
-    """
+    #"""
 
-    Rc_change = k_depal(palmitic_acid) * np.sum(Rp) * AREA_SQUARE #- (new_sum-previous_sum)
+    Rc_change = k_depal(palmitic_acid) * np.sum(Rp) * AREA_SQUARE - (new_sum-previous_sum)
 
     Rp += Rp_change * DELTA_T
     Rrs += Rr_change * DELTA_T
     Rc += Rc_change * DELTA_T
 
-    Rp, Rrs, Rc = np.clip(Rp, 0, None), np.clip(Rrs, 0, None), min(0, Rc)
+    #Rp, Rrs, Rc = np.clip(Rp, 0, None), np.clip(Rrs, 0, None), min(0, Rc)
 
 print(len(frames))
 
