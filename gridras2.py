@@ -1,5 +1,8 @@
 import matplotlib.pyplot as plt
 import numpy as np
+import cv2
+import imageio
+from tqdm import tqdm
 
 # long-term rate/slope of palmitic acid
 PALMITIC_RATE = 1.5
@@ -8,23 +11,23 @@ INITIAL_PALMITIC = 327.06
 
 
 DELTA_T = 0.1
-D_p = 0.1
-KOFF = 
-AREA_SQUARE = 0.01
+D_p = 1
+KOFF = 10.75
+AREA_SQUARE = 1
 SIGMA = 3
-KON_BASE = 10**6
+KON_BASE = 100
 HILL = 1.5
 N = 5
-k_depal_max = 90
+k_depal_max = 0.015
 Km_depal = 89
 
 # initial time at which palmitic reachs linear behaviour and we start this simulation 
 INITIAL_TIME = 20
-FINAL_TIME = 50
+FINAL_TIME = 320
 times = np.arange(INITIAL_TIME, FINAL_TIME, DELTA_T)
 
 # grid side size
-GRID_SIZE = 120
+GRID_SIZE = 200
 
 """
 Grid code now
@@ -47,7 +50,7 @@ colors[golgi] = LIGHT_RED
 outside_indices = [(i, j) for i in range(GRID_SIZE) for j in range(GRID_SIZE) if not (i == center_grid and j == center_grid)]
 
 # choose a random # for lipid rafts (30-1800ish depending on density)
-num_rafts = 1200
+num_rafts = 1000
 
 # list of (xi, yi)
 rafts = np.random.choice(len(outside_indices), num_rafts, replace=False)
@@ -56,6 +59,7 @@ for idx in rafts:
     i, j = outside_indices[idx]
     colors[i, j] = LIGHT_BLUE
 
+rafts = [outside_indices[idx] for idx in rafts]
 
 """
 These are the variables we are tracking over time
@@ -76,6 +80,7 @@ def laplacian_rp(u, v):
         if (0 <= i < GRID_SIZE) and (0 <= j < GRID_SIZE):
             total += Rp[j, i]
     
+    # if AREA_SQUARE is too small than the laplacian_rp is magnified too much so change * delta_t decreases Rp below 0
     return total / AREA_SQUARE
 
 def kon(raft_idx):
@@ -89,10 +94,18 @@ def k_depal(palmitic_acid):
 
 
 print("Simulation Started")
+frames = []
 
-for t in times:
-    # write injection code here??
+for t in tqdm(times):
+    Rp_normalized = np.uint8(255 * (Rp - np.min(Rp)) / (np.max(Rp) - np.min(Rp) + 1e-8))
+    colored = cv2.applyColorMap(Rp_normalized, cv2.COLORMAP_INFERNO)
+    colored = cv2.cvtColor(colored, cv2.COLOR_BGR2RGB)
+    frames.append(colored)
 
+    # ----------------------------------------------------
+
+    if t < 50:
+        Rp[center_grid, center_grid] = 1000
 
     palmitic_acid = (t - INITIAL_TIME) * PALMITIC_RATE + INITIAL_PALMITIC
 
@@ -101,16 +114,36 @@ for t in times:
         for u in range(GRID_SIZE)
     ])
 
+
+    Rr_change = np.zeros(num_rafts)
+
     for raft_idx, (xi, yi) in enumerate(rafts):
-        Rp_change += (-kon(raft_idx) * Rp[yi, xi]**HILL * (1 - Rrs[raft_idx]/N))
-        Rp_change += (KOFF * Rrs[raft_idx])
+        total = (-kon(raft_idx) * Rp[yi, xi]**HILL * (1 - Rrs[raft_idx]/N)) + (KOFF * Rrs[raft_idx])
+        # clip so that its not too positive that it makes Rr negative and too negative that it makes Rp negative
+        total = np.clip(total, -Rp[yi, xi]/DELTA_T, Rrs[raft_idx]/DELTA_T)
 
-    Rr_change = np.array([kon(raft_idx) * Rp[yi, xi]**HILL * (1 - (Rrs[raft_idx]/N)) - KOFF * Rrs[raft_idx] for raft_idx, (xi, yi) in enumerate(rafts)])
+        Rp_change[yi, xi] += total
+        Rr_change[raft_idx] = -total
 
-    Rc_change = k_depal(palmitic_acid) * np.sum(Rp) * AREA_SQUARE
+    # clipping rp for conservation of matter
+    """
+    previous_sum = np.sum(Rp_change)
+    Rp_change = np.maximum(Rp_change, -Rp/DELTA_T)
+    new_sum = np.sum(Rp_change)
+    assert new_sum >= previous_sum
+    """
+
+    Rc_change = k_depal(palmitic_acid) * np.sum(Rp) * AREA_SQUARE #- (new_sum-previous_sum)
 
     Rp += Rp_change * DELTA_T
     Rrs += Rr_change * DELTA_T
     Rc += Rc_change * DELTA_T
 
+    Rp, Rrs, Rc = np.clip(Rp, 0, None), np.clip(Rrs, 0, None), min(0, Rc)
 
+print(len(frames))
+
+out = cv2.VideoWriter("heatmap.mp4", cv2.VideoWriter_fourcc(*'mp4v'), 1/DELTA_T, (GRID_SIZE, GRID_SIZE))
+for frame in frames:
+    out.write(cv2.cvtColor(frame, cv2.COLOR_RGB2BGR))
+out.release()
