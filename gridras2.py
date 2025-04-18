@@ -11,12 +11,12 @@ INITIAL_PALMITIC = 327.06
 
 
 DELTA_T = 0.1
-D_p = 0.01
+D_p = 1
 AREA_SQUARE = 1
 k_depal_max = 0.015
 Km_depal = 89
 
-# these don't matter
+# these don't matter when num_rafts=0
 KON_BASE = 100
 KOFF = 10.75
 SIGMA = 3
@@ -25,11 +25,11 @@ N = 5
 
 # initial time at which palmitic reachs linear behaviour and we start this simulation 
 INITIAL_TIME = 0
-FINAL_TIME = 1000
+FINAL_TIME = 2000
 times = np.arange(INITIAL_TIME, FINAL_TIME, DELTA_T)
 
 # grid side size
-GRID_SIZE = 50
+GRID_SIZE = 200
 
 """
 Grid code now
@@ -52,7 +52,7 @@ colors[golgi] = LIGHT_RED
 outside_indices = [(i, j) for i in range(GRID_SIZE) for j in range(GRID_SIZE) if not (i == center_grid and j == center_grid)]
 
 # choose a random # for lipid rafts (30-1800ish depending on density)
-num_rafts = 0
+num_rafts = 1000
 
 # list of (xi, yi)
 rafts = np.random.choice(len(outside_indices), num_rafts, replace=False)
@@ -61,7 +61,7 @@ for idx in rafts:
     i, j = outside_indices[idx]
     colors[i, j] = LIGHT_BLUE
 
-rafts = [outside_indices[idx] for idx in rafts]
+rafts = np.array([outside_indices[idx] for idx in rafts])
 
 """
 These are the variables we are tracking over time
@@ -74,19 +74,7 @@ Rrs = np.zeros(num_rafts)
 Rc = 100
 
 
-def laplacian_rp(u, v):
-    
-    # might not always be 4 at the edge
-    total = -4 * Rp[v, u]
-
-    for (i, j) in [(u+1, v), (u-1, v), (u, v+1), (u, v-1)]:
-        if (0 <= i < GRID_SIZE) and (0 <= j < GRID_SIZE):
-            total += Rp[j, i]
-    
-    # if AREA_SQUARE is too small than the laplacian_rp is magnified too much so change * delta_t decreases Rp below 0
-    return total / AREA_SQUARE
-
-def compute_laplacian_slicing(Rp):
+def compute_laplacian(Rp):
     laplacian = np.zeros_like(Rp)
     laplacian[1:-1, 1:-1] = (
         Rp[1:-1, 2:] + Rp[1:-1, :-2] +
@@ -117,19 +105,12 @@ for t in tqdm(times):
 
     # ----------------------------------------------------
 
-    if t < 50:
+    if t < 100:
         Rp[center_grid, center_grid] = 1000
 
-    palmitic_acid = (t - INITIAL_TIME)/60 * PALMITIC_RATE + INITIAL_PALMITIC
-
-    """
-    Rp_change = np.array([
-        [(D_p * laplacian_rp(u, v) - k_depal(palmitic_acid) * Rp[v, u]) for v in range(GRID_SIZE)]
-        for u in range(GRID_SIZE)
-    ])
-    """
+    palmitic_acid = INITIAL_PALMITIC #+ (t - INITIAL_TIME)/60 * PALMITIC_RATE 
     
-    Rp_change = D_p * compute_laplacian_slicing(Rp) - k_depal(palmitic_acid) * Rp
+    Rp_change = D_p * compute_laplacian(Rp) - k_depal(palmitic_acid) * Rp
 
 
     Rr_change = np.zeros(num_rafts)
@@ -160,7 +141,8 @@ for t in tqdm(times):
 
 print(len(frames))
 
-out = cv2.VideoWriter("heatmap.mp4", cv2.VideoWriter_fourcc(*'mp4v'), 1/DELTA_T, (GRID_SIZE, GRID_SIZE))
+# 100x speed
+out = cv2.VideoWriter("heatmap.mp4", cv2.VideoWriter_fourcc(*'mp4v'), 100/DELTA_T, (GRID_SIZE, GRID_SIZE))
 for frame in frames:
     out.write(cv2.cvtColor(frame, cv2.COLOR_RGB2BGR))
 out.release()
