@@ -62,3 +62,6 @@ for idx, metabolite in enumerate(variables):
     plt.savefig(f"rasgraphs/{metabolite}", dpi=600)
     plt.clf()
 
+Rp = z[variables.index("R_p")]
+np.save("Rp.npy", Rp)
+np.save("times.npy", t)
