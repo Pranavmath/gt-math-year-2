@@ -3,6 +3,7 @@ import numpy as np
 import cv2
 import imageio
 from tqdm import tqdm
+from scipy.ndimage import convolve
 
 # long-term rate/slope of palmitic acid
 PALMITIC_RATE = 1.5
@@ -11,7 +12,7 @@ INITIAL_PALMITIC = 327.06
 
 
 DELTA_T = 0.1
-D_p = 1
+D_p = 10
 AREA_SQUARE = 1
 k_depal_max = 0.015
 Km_depal = 89
@@ -25,11 +26,11 @@ N = 5
 
 # initial time at which palmitic reachs linear behaviour and we start this simulation 
 INITIAL_TIME = 0
-FINAL_TIME = 2000
+FINAL_TIME = 10000
 times = np.arange(INITIAL_TIME, FINAL_TIME, DELTA_T)
 
 # grid side size
-GRID_SIZE = 200
+GRID_SIZE = 120
 
 """
 Grid code now
@@ -52,7 +53,7 @@ colors[golgi] = LIGHT_RED
 outside_indices = [(i, j) for i in range(GRID_SIZE) for j in range(GRID_SIZE) if not (i == center_grid and j == center_grid)]
 
 # choose a random # for lipid rafts (30-1800ish depending on density)
-num_rafts = 1000
+num_rafts = 5000
 
 # list of (xi, yi)
 rafts = np.random.choice(len(outside_indices), num_rafts, replace=False)
@@ -61,7 +62,18 @@ for idx in rafts:
     i, j = outside_indices[idx]
     colors[i, j] = LIGHT_BLUE
 
+# get raft coords and kons for each raft
 rafts = np.array([outside_indices[idx] for idx in rafts])
+xi_vals, yi_vals = rafts[:, 0], rafts[:, 1]
+dist_squared = xi_vals**2 + yi_vals**2
+kon_vals = KON_BASE * np.exp(-dist_squared / (SIGMA**2))
+
+# mask where we don't do (- k_depal(palmitic_acid) * Rp)
+no_depal_mask = np.zeros((GRID_SIZE, GRID_SIZE))
+no_depal_mask[yi_vals, xi_vals] = 1
+# dont do at golgi
+no_depal_mask[center_grid, center_grid] = 1
+
 
 """
 These are the variables we are tracking over time
@@ -73,21 +85,22 @@ Rrs = np.zeros(num_rafts)
 # Rc
 Rc = 100
 
+Rcs = []
+Rr_sums = []
+Rr_heatmap = np.zeros((GRID_SIZE, GRID_SIZE))
 
-def compute_laplacian(Rp):
-    laplacian = np.zeros_like(Rp)
-    laplacian[1:-1, 1:-1] = (
-        Rp[1:-1, 2:] + Rp[1:-1, :-2] +
-        Rp[2:, 1:-1] + Rp[:-2, 1:-1] -
-        4 * Rp[1:-1, 1:-1]
-    )
+def get_random_kernel():
+    kernel = np.random.normal(loc=0, scale=2, size=(3, 3))
+    kernel[1, 1] = 0
+    # make sure its always going outwards
+    kernel = np.sign(np.sum(kernel)) * kernel
+    assert np.sum(kernel) >= 0
+    kernel[1, 1] = -np.sum(kernel)
+    return kernel
+
+def compute_laplacian(Rp, laplacian_kernel):
+    laplacian = convolve(Rp, laplacian_kernel, mode='constant', cval=0.0)
     return laplacian / AREA_SQUARE
-
-
-def kon(raft_idx):
-    xi, yi = rafts[raft_idx]
-    dist_squared = xi**2 + yi**2
-    return KON_BASE * np.exp(-dist_squared/(SIGMA**2))
 
 
 def k_depal(palmitic_acid):
@@ -96,53 +109,138 @@ def k_depal(palmitic_acid):
 
 print("Simulation Started")
 frames = []
+rr_frames = []
+
+start_time = 0
+
+change_sum_before = []
+change_sum_after = []
+
+def get_colored(arr):
+    arr_normalized = np.uint8(255 * (arr - np.min(arr)) / (np.max(arr) - np.min(arr) + 1e-8))
+    colored = cv2.applyColorMap(arr_normalized, cv2.COLORMAP_INFERNO)
+    colored = cv2.cvtColor(colored, cv2.COLOR_BGR2RGB)
+    return colored
 
 for t in tqdm(times):
-    Rp_normalized = np.uint8(255 * (Rp - np.min(Rp)) / (np.max(Rp) - np.min(Rp) + 1e-8))
-    colored = cv2.applyColorMap(Rp_normalized, cv2.COLORMAP_INFERNO)
-    colored = cv2.cvtColor(colored, cv2.COLOR_BGR2RGB)
-    frames.append(colored)
+
+    #"""
+    frames.append(get_colored(Rp))
+    rr_frames.append(get_colored(Rr_heatmap))
+    #"""
 
     # ----------------------------------------------------
+    Rcs.append(Rc)
+    Rr_sums.append(np.sum(Rrs))
+    Rr_heatmap[yi_vals, xi_vals] = Rrs
+    
+    """
+    if (Rp[center_grid, center_grid] < 1):
+        start_time = t
+    
+    if (start_time <= t <= start_time + 5):
+        Rp[center_grid, center_grid] += 100
+    """
 
-    if t < 100:
-        Rp[center_grid, center_grid] = 1000
+    Rp[center_grid, center_grid] = 100
+
 
     palmitic_acid = INITIAL_PALMITIC #+ (t - INITIAL_TIME)/60 * PALMITIC_RATE 
-    
-    Rp_change = D_p * compute_laplacian(Rp) - k_depal(palmitic_acid) * Rp
 
-
-    Rr_change = np.zeros(num_rafts)
-
-    for raft_idx, (xi, yi) in enumerate(rafts):
-        total = (-kon(raft_idx) * Rp[yi, xi]**HILL * (1 - Rrs[raft_idx]/N)) + (KOFF * Rrs[raft_idx])
-        # clip so that its not too positive that it makes Rr negative and too negative that it makes Rp negative
-        total = np.clip(total, -Rp[yi, xi]/DELTA_T, Rrs[raft_idx]/DELTA_T)
-
-        Rp_change[yi, xi] += total
-        Rr_change[raft_idx] = -total
-
-    # clipping rp for conservation of matter
     #"""
+    kernel = np.array([
+        [0,  0.1, 0],
+        [0.1, -0.4, 0.1],
+        [0,  0.1, 0]
+    ])
+    #"""
+    #kernel = get_random_kernel()
+    #print(kernel)
+    
+    laplacian_rp = compute_laplacian(Rp, kernel)
+    Rp_change = D_p * laplacian_rp  - (1-no_depal_mask) * k_depal(palmitic_acid) * Rp * 0.05
+
+    # try golgi change is 0
+    Rp_change[center_grid, center_grid] = 0
+
+    change_sum_before.append(np.sum(Rp_change))
+
+    # calculate the changes for Rp and Rr
+    Rp_vals = Rp[yi_vals, xi_vals]
+    binding = -kon_vals * Rp_vals**HILL * (1 - Rrs / N)
+    unbinding = KOFF * Rrs
+    totals = binding + unbinding
+    """
+    #clip for conservation of matter
+    max_neg = -Rp_vals / DELTA_T
+    max_pos = Rrs / DELTA_T
+    totals = np.clip(totals, max_neg, max_pos)
+    """
+    # Apply changes
+    np.add.at(Rp_change, (yi_vals, xi_vals), totals)
+    Rr_change = -totals
+
+
+    change_sum_after.append(np.sum(Rp_change))
+
+    """
+    # clipping rp_change for conservation of matter
     previous_sum = np.sum(Rp_change)
     Rp_change = np.maximum(Rp_change, -Rp/DELTA_T)
     new_sum = np.sum(Rp_change)
     assert new_sum >= previous_sum
-    #"""
+    """
 
-    Rc_change = k_depal(palmitic_acid) * np.sum(Rp) * AREA_SQUARE - (new_sum-previous_sum)
+    Rc_change = k_depal(palmitic_acid) * np.sum(Rp * (1-no_depal_mask)) * AREA_SQUARE #- (new_sum-previous_sum)
+    
 
     Rp += Rp_change * DELTA_T
     Rrs += Rr_change * DELTA_T
     Rc += Rc_change * DELTA_T
 
-    #Rp, Rrs, Rc = np.clip(Rp, 0, None), np.clip(Rrs, 0, None), min(0, Rc)
+
+
+def save_graph(datapoints, name):
+    plt.plot(times, datapoints, color="purple", linestyle='-', linewidth=1.5)
+    
+    # Add title and axis labels with LaTeX for µM symbol
+    plt.title(f"Comparison for {name}", fontsize=16, fontweight='bold')
+    plt.xlabel("Iteration", fontsize=14)
+    plt.ylabel(r'Concentration ($\mu$M)', fontsize=14)
+
+    # Enable grid for better readability of the plot
+    plt.grid(True, linestyle='--', alpha=0.7)
+
+    # Improve the layout to avoid overlap
+    plt.tight_layout()
+
+    # Save the plot with higher resolution (300 dpi)
+    plt.savefig(f"gridrasgraphs/{name}.jpg", dpi=600)
+    
+    # Clear figure for the next plot
+    plt.clf()
+
+
+plt.plot(times, change_sum_before, label="before")
+plt.plot(times, change_sum_after, label="after")
+plt.legend()
+plt.show()
+
 
 print(len(frames))
 
-# 100x speed
-out = cv2.VideoWriter("heatmap.mp4", cv2.VideoWriter_fourcc(*'mp4v'), 100/DELTA_T, (GRID_SIZE, GRID_SIZE))
+# 1000x speed
+out = cv2.VideoWriter("heatmap.mp4", cv2.VideoWriter_fourcc(*'mp4v'), 1000/DELTA_T, (GRID_SIZE, GRID_SIZE))
 for frame in frames:
     out.write(cv2.cvtColor(frame, cv2.COLOR_RGB2BGR))
 out.release()
+
+# 1000x speed
+out = cv2.VideoWriter("rrheatmap.mp4", cv2.VideoWriter_fourcc(*'mp4v'), 1000/DELTA_T, (GRID_SIZE, GRID_SIZE))
+for frame in rr_frames:
+    out.write(cv2.cvtColor(frame, cv2.COLOR_RGB2BGR))
+out.release()
+
+
+save_graph(Rcs, "rc")
+save_graph(Rr_sums, "rrsum")
