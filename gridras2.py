@@ -12,7 +12,7 @@ INITIAL_PALMITIC = 327.06
 
 
 DELTA_T = 0.1
-D_p = 10
+D_p = 1
 AREA_SQUARE = 1
 k_depal_max = 0.015
 Km_depal = 89
@@ -30,7 +30,7 @@ FINAL_TIME = 10000
 times = np.arange(INITIAL_TIME, FINAL_TIME, DELTA_T)
 
 # grid side size
-GRID_SIZE = 120
+GRID_SIZE = 100
 
 """
 Grid code now
@@ -167,6 +167,9 @@ for t in tqdm(times):
 
     # calculate the changes for Rp and Rr
     Rp_vals = Rp[yi_vals, xi_vals]
+
+    
+    # can go to nan if Rp_vals is negative => complex
     binding = -kon_vals * Rp_vals**HILL * (1 - Rrs / N)
     unbinding = KOFF * Rrs
     totals = binding + unbinding
@@ -197,6 +200,8 @@ for t in tqdm(times):
     Rp += Rp_change * DELTA_T
     Rrs += Rr_change * DELTA_T
     Rc += Rc_change * DELTA_T
+
+    Rp = np.clip(Rp, 0, a_max=None)
 
 
 
