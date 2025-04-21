@@ -26,7 +26,7 @@ N = 5
 
 # initial time at which palmitic reachs linear behaviour and we start this simulation 
 INITIAL_TIME = 0
-FINAL_TIME = 10000
+FINAL_TIME = 4000
 times = np.arange(INITIAL_TIME, FINAL_TIME, DELTA_T)
 
 # grid side size

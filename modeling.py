@@ -136,7 +136,7 @@ for idx, metabolite in enumerate(tracking_variables):
     plt.title(f"Comparison for {metabolite}", fontsize=16, fontweight='bold')
     plt.xlabel("Iteration", fontsize=14)
     plt.ylabel(r'Concentration ($\mu$M)', fontsize=14)
-    plt.yticks(np.arange(100, 400, 10)) 
+    #plt.yticks(np.arange(100, 400, 10)) 
 
     # Enable grid for better readability of the plot
     plt.grid(True, linestyle='--', alpha=0.7)
