@@ -126,31 +126,34 @@ end = time()
 
 print(f"Solving Done: seconds per iter: {(end-begin)/NUM_ITER}")
 
-for idx, metabolite in enumerate(tracking_variables):
+for idx, metabolite in enumerate(["D-Glucose", "Pyruvate", "Dodecanoyl-[acyl-carrier protein]", "Palmitic Acid"]):
     datapoints = z[idx]
     
     # Plot the iterative data with markers and a solid line
-    plt.plot(t, datapoints, color="purple", linestyle='-', linewidth=1.5)
+    plt.plot(t, datapoints, linestyle='-', linewidth=1.5, label=metabolite)
     
-    # Add title and axis labels with LaTeX for µM symbol
-    plt.title(f"Comparison for {metabolite}", fontsize=16, fontweight='bold')
-    plt.xlabel("Iteration", fontsize=14)
-    plt.ylabel(r'Concentration ($\mu$M)', fontsize=14)
-    #plt.yticks(np.arange(100, 400, 10)) 
+# Add title and axis labels with LaTeX for µM symbol
+plt.title(f"Comparison for Many Metabolites", fontsize=16, fontweight='bold')
+plt.xlabel("Iteration", fontsize=14)
+plt.ylabel(r'Concentration ($\mu$M)', fontsize=14)
+#plt.yticks(np.arange(100, 400, 10)) 
 
-    # Enable grid for better readability of the plot
-    plt.grid(True, linestyle='--', alpha=0.7)
+plt.legend()
 
-    # Improve the layout to avoid overlap
-    plt.tight_layout()
+# Enable grid for better readability of the plot
+plt.grid(True, linestyle='--', alpha=0.7)
 
-    # Save the plot with higher resolution (300 dpi)
-    plt.savefig(f"graphs/{metabolite}", dpi=600)
-    
-    # Clear figure for the next plot
-    plt.clf()
+# Improve the layout to avoid overlap
+plt.tight_layout()
+
+# Save the plot with higher resolution (300 dpi)
+plt.savefig(f"graphs/combined.png", dpi=600)
+
+# Clear figure for the next plot
+plt.clf()
 
 
+"""
 palmitic = z[tracking_variables.index("Palmitic Acid")]
 
 # it is linear after around 20 seconds
@@ -169,3 +172,4 @@ slope = (final_palmitic-initial_palmitic)/(final_time-initial_time)
 
 print(f"slope: {slope}")
 print(f"concentration at intital time: {initial_palmitic}")
+"""

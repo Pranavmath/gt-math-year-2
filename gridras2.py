@@ -122,6 +122,8 @@ def get_colored(arr):
     colored = cv2.cvtColor(colored, cv2.COLOR_BGR2RGB)
     return colored
 
+Rp_total = []
+
 for t in tqdm(times):
 
     #"""
@@ -132,6 +134,7 @@ for t in tqdm(times):
     # ----------------------------------------------------
     Rcs.append(Rc)
     Rr_sums.append(np.sum(Rrs))
+    Rp_total.append(np.sum(Rp))
     
     """
     if (Rp[center_grid, center_grid] < 1):
@@ -140,9 +143,9 @@ for t in tqdm(times):
     if (start_time <= t <= start_time + 5):
         Rp[center_grid, center_grid] += 100
     """
-
-    Rp[center_grid, center_grid] = 100
-
+    if (abs(t % 200) <= 0.5):
+        Rp[center_grid, center_grid] = 100
+    
 
     palmitic_acid = INITIAL_PALMITIC #+ (t - INITIAL_TIME)/60 * PALMITIC_RATE 
 
@@ -159,7 +162,9 @@ for t in tqdm(times):
     laplacian_rp = compute_laplacian(Rp, kernel)
     Rp_change = D_p * laplacian_rp  - (1-no_depal_mask) * k_depal(palmitic_acid) * Rp * 0.05
 
-    # try golgi change is 0
+    """
+    if this is commented then sinusodial if not then not sinusodial
+    """
     Rp_change[center_grid, center_grid] = 0
 
     change_sum_before.append(np.sum(Rp_change))
@@ -206,13 +211,17 @@ for t in tqdm(times):
 
 
 
-def save_graph(datapoints, name):
-    plt.plot(times, datapoints, color="purple", linestyle='-', linewidth=1.5)
+def save_graph(a, b, c):
+    plt.plot(times, a, color="purple", linestyle='-', linewidth=1.5, label="Rc Total")
+    plt.plot(times, b, color="blue", linestyle='-', linewidth=1.5, label = "Rp Total")
+    plt.plot(times, c, color="black", linestyle='-', linewidth=1.5, label="Rr Total")
+
     
     # Add title and axis labels with LaTeX for µM symbol
-    plt.title(f"Comparison for {name}", fontsize=16, fontweight='bold')
+    plt.title(f"Comparison for Rp, Rr, and Rc", fontsize=16, fontweight='bold')
     plt.xlabel("Iteration", fontsize=14)
     plt.ylabel(r'Log Concentration ($\mu$M)', fontsize=14)
+    plt.legend()
 
     # Enable grid for better readability of the plot
     plt.grid(True, linestyle='--', alpha=0.7)
@@ -221,16 +230,16 @@ def save_graph(datapoints, name):
     plt.tight_layout()
 
     # Save the plot with higher resolution (300 dpi)
-    plt.savefig(f"gridrasgraphs/{name}.jpg", dpi=600)
+    plt.savefig(f"gridrasgraphs/combined.jpg", dpi=600)
     
     # Clear figure for the next plot
     plt.clf()
 
 
-plt.plot(times, change_sum_before, label="before")
-plt.plot(times, change_sum_after, label="after")
-plt.legend()
-plt.show()
+#plt.plot(times, change_sum_before, label="before")
+#plt.plot(times, change_sum_after, label="after")
+#plt.legend()
+#plt.show()
 
 
 print(len(frames))
@@ -241,12 +250,10 @@ for frame in frames:
     out.write(cv2.cvtColor(frame, cv2.COLOR_RGB2BGR))
 out.release()
 
-# 1000x speed
-out = cv2.VideoWriter("rrheatmap.mp4", cv2.VideoWriter_fourcc(*'mp4v'), 1000/DELTA_T, (GRID_SIZE, GRID_SIZE))
-for frame in rr_frames:
+out = cv2.VideoWriter("rrheatmap.mp4", cv2.VideoWriter_fourcc(*'mp4v'), 10, (GRID_SIZE, GRID_SIZE))
+for frame in rr_frames[:1000]:
     out.write(cv2.cvtColor(frame, cv2.COLOR_RGB2BGR))
 out.release()
 
 
-save_graph(np.log(Rcs), "rc")
-save_graph(np.log(Rr_sums), "rrsum")
+save_graph(np.log(Rcs), np.log(Rp_total), np.log(Rr_sums))
