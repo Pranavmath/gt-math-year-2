@@ -53,7 +53,7 @@ colors[golgi] = LIGHT_RED
 outside_indices = [(i, j) for i in range(GRID_SIZE) for j in range(GRID_SIZE) if not (i == center_grid and j == center_grid)]
 
 # choose a random # for lipid rafts (30-1800ish depending on density)
-num_rafts = 5000
+num_rafts = 1300
 
 # list of (xi, yi)
 rafts = np.random.choice(len(outside_indices), num_rafts, replace=False)
@@ -65,7 +65,7 @@ for idx in rafts:
 # get raft coords and kons for each raft
 rafts = np.array([outside_indices[idx] for idx in rafts])
 xi_vals, yi_vals = rafts[:, 0], rafts[:, 1]
-dist_squared = xi_vals**2 + yi_vals**2
+dist_squared =  100 + (xi_vals-center_grid)**2 + (yi_vals-center_grid)**2
 kon_vals = KON_BASE * np.exp(-dist_squared / (SIGMA**2))
 
 # mask where we don't do (- k_depal(palmitic_acid) * Rp)
@@ -132,7 +132,6 @@ for t in tqdm(times):
     # ----------------------------------------------------
     Rcs.append(Rc)
     Rr_sums.append(np.sum(Rrs))
-    Rr_heatmap[yi_vals, xi_vals] = Rrs
     
     """
     if (Rp[center_grid, center_grid] < 1):
@@ -168,7 +167,6 @@ for t in tqdm(times):
     # calculate the changes for Rp and Rr
     Rp_vals = Rp[yi_vals, xi_vals]
 
-    
     # can go to nan if Rp_vals is negative => complex
     binding = -kon_vals * Rp_vals**HILL * (1 - Rrs / N)
     unbinding = KOFF * Rrs
@@ -202,6 +200,9 @@ for t in tqdm(times):
     Rc += Rc_change * DELTA_T
 
     Rp = np.clip(Rp, 0, a_max=None)
+    #print(np.min(Rrs), np.max(Rrs))
+    Rr_heatmap[yi_vals, xi_vals] = np.where(Rrs > 0, np.log(np.clip(Rrs, 1e-10, None)), 0)
+
 
 
 
@@ -211,7 +212,7 @@ def save_graph(datapoints, name):
     # Add title and axis labels with LaTeX for µM symbol
     plt.title(f"Comparison for {name}", fontsize=16, fontweight='bold')
     plt.xlabel("Iteration", fontsize=14)
-    plt.ylabel(r'Concentration ($\mu$M)', fontsize=14)
+    plt.ylabel(r'Log Concentration ($\mu$M)', fontsize=14)
 
     # Enable grid for better readability of the plot
     plt.grid(True, linestyle='--', alpha=0.7)
@@ -247,5 +248,5 @@ for frame in rr_frames:
 out.release()
 
 
-save_graph(Rcs, "rc")
-save_graph(Rr_sums, "rrsum")
+save_graph(np.log(Rcs), "rc")
+save_graph(np.log(Rr_sums), "rrsum")
